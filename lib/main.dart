@@ -35,38 +35,45 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    Widget page;
+    Widget page; //para adicionar novas paginas colocar no switch case
     switch (selectedIndex) {
-      case 0:
-        page = GeneratorPage();
+      case 0: //menu
+        page = GeneratorPage(); //criação de pagina para redirecionamento
         break;
       case 1:
-        page = Placeholder();
+        page = FavoritePage();
         break;
       default:
         throw UnimplementedError('no widget for $selectedIndex');
     }
 
     return LayoutBuilder(builder: (context, constraints) {
+      //desenho do menu lateral
       return Scaffold(
         body: Row(
           children: [
             SafeArea(
+              //bloco branco
               child: NavigationRail(
-                extended: constraints.maxWidth >= 600,
+                //faz a logica de direcionamento, navegação
+                extended: constraints.maxWidth >=
+                    600, //maior que 600px muda a apresentação
                 destinations: [
                   NavigationRailDestination(
+                    //destino de navegação
                     icon: Icon(Icons.home),
                     label: Text('Home'),
                   ),
                   NavigationRailDestination(
                     icon: Icon(Icons.favorite),
-                    label: Text('Favorites'),
+                    label: Text('Favorites'), //adicionar uma nova pagina abaixo
                   ),
                 ],
-                selectedIndex: selectedIndex,
+                selectedIndex: selectedIndex, //indice selecionado
                 onDestinationSelected: (value) {
-                  print('selected: $value');
+                  //quando clicar nmo botao e passado como parametro
+                  print(
+                      'selected: $value'); //muda o valor selecionado para mudar a pagina
                   setState(() {
                     selectedIndex = value;
                   });
@@ -74,9 +81,10 @@ class _MyHomePageState extends State<MyHomePage> {
               ),
             ),
             Expanded(
+              //conteudo da pagina
               child: Container(
                 color: Theme.of(context).colorScheme.primaryContainer,
-                child: page,
+                child: page, //elemento que muda
               ),
             ),
           ],
@@ -178,5 +186,33 @@ class MyAppState extends ChangeNotifier {
       favorites.add(current);
     }
     notifyListeners();
+  }
+}
+
+class FavoritePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    var appState = context.watch<MyAppState>();
+
+    if (appState.favorites.isEmpty) {
+      return Center(
+        child: Text('No favorites'),
+      );
+    }
+
+    return ListView(
+      children: [
+        Padding(
+          padding: const EdgeInsets.all(20),
+          child: Text('You have  '
+              '${appState.favorites.length} favorites:'),
+        ),
+        for (var pair in appState.favorites)
+          ListTile(
+            leading: Icon(Icons.favorite),
+            title: Text(pair.asLowerCase),
+          ),
+      ],
+    );
   }
 }
